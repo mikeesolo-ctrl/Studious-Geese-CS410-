@@ -1,10 +1,11 @@
-import java.io BufferedReader;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.scanner;
+import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.IOException;
 
 public class main {
     public static void main(){
@@ -28,5 +29,18 @@ public class main {
 
             List<String> tokens = Compiler.tokenize(fileString); //Turn the file into tokens
 
+            //print tokens to the console
+            for(String token : tokens){
+                System.out.println(token);
+            }
+
+            //write tokens to a file
+            try(FileWriter output = new FileWriter("tokens.txt")) {
+                for(String token : tokens){
+                    output.write(token + "\n");
+                }
+            } catch (IOException e) {
+                System.err.println("Error writing output file: " + e.getMessage());
+            }
     }
 }
