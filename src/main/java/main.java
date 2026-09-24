@@ -10,7 +10,7 @@ import java.util.List;
 public class main {
     public static void main(){
 
-        Scanner scnr = new Scaner(System.in); //Create Scanner to get file name 
+        Scanner scnr = new Scanner(System.in); //Create Scanner to get file name 
         String fileName = scnr.next(); //Set the next System in to fileName
 
         File file = new File(fileName); //Create file var with that name
