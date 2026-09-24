@@ -5,11 +5,11 @@ public class Scanner{
 
 
     public static List<String> tokenize(String file) {
-        List<String> tokens = new ArrayLis<>(); //Where to store tokens
+        List<String> tokens = new ArrayList<>(); //Where to store tokens
         int pos = 0;
 
         while(pos < file.length()){
-            Char curr = file.charAt(pos);
+            char curr = file.charAt(pos);
             
         }
     }
