@@ -16,7 +16,14 @@ public class Tables {
     public static final int IN_SUB = 23; // -
     public static final int IN_SEMI = 24; // ;
     public static final int IN_OTHER = 25; // anything else -> no transition
-    public static final int NUM_INPUTS = 26;
+    public static final int IN_NUM = 26; // ;
+    public static final int IN_DOT = 27; // .
+    public static final int IN_PLUS = 28; // +
+    public static final int IN_OPEN_PAR = 29; // (
+    public static final int IN_CLOSED_PAR = 30; // )
+    public static final int IN_OPEN_CURLY = 31; // {
+    public static final int IN_CLOSED_CURLY = 32; // }
+    public static final int NUM_INPUTS = 33;
 
     // Rows
     public static final int S_START = 0;
@@ -33,8 +40,15 @@ public class Tables {
     public static final int S_MULT = 11; // *
     public static final int S_SUB = 12; // -
     public static final int S_TERM = 13; // ;
-    public static final int FIRST_KW_STATE = 14;
-    public static final int NUM_STATES = 49;
+    public static final int S_NUM = 14; // nums 0-9
+    public static final int S_DOT = 15; // .
+    public static final int S_PLUS = 16; // +
+    public static final int S_OPEN_PAR = 17; // (
+    public static final int S_CLOSED_PAR = 18; // )
+    public static final int S_OPEN_CURLY = 19; // {
+    public static final int S_CLOSED_CURLY = 20; // }
+    public static final int FIRST_KW_STATE = 21;
+    public static final int NUM_STATES = 60;
     public static final int ERR = -1;
 
     public static final Map<Character, Integer> INPUT_MAP = new HashMap<>();
@@ -50,6 +64,8 @@ public class Tables {
             INPUT_MAP.put(c, IN_LETTER);
         for (char c = 'A'; c <= 'Z'; c++)
             INPUT_MAP.put(c, IN_LETTER);
+        for (char num = '0'; num <= '9'; num++)
+            INPUT_MAP.put(num, IN_NUM);
         for (int i = 0; i < KEYWORD_LETTERS.length(); i++)
             INPUT_MAP.put(KEYWORD_LETTERS.charAt(i), i);
         INPUT_MAP.put('<', IN_LT);
@@ -60,6 +76,12 @@ public class Tables {
         INPUT_MAP.put('*', IN_MULT);
         INPUT_MAP.put('-', IN_SUB);
         INPUT_MAP.put(';', IN_SEMI);
+        INPUT_MAP.put('.', IN_DOT);
+        INPUT_MAP.put('+', IN_PLUS);
+        INPUT_MAP.put('(', IN_OPEN_PAR);
+        INPUT_MAP.put(')', IN_CLOSED_PAR);
+        INPUT_MAP.put('{', IN_OPEN_CURLY);
+        INPUT_MAP.put('}', IN_CLOSED_CURLY);
 
         for (int[] row : TRANSITIONS)
             Arrays.fill(row, ERR);
@@ -77,6 +99,14 @@ public class Tables {
         TRANSITIONS[S_START][IN_MULT] = S_MULT;
         TRANSITIONS[S_START][IN_SUB] = S_SUB;
         TRANSITIONS[S_START][IN_SEMI] = S_TERM;
+        TRANSITIONS[S_START][IN_NUM] = S_NUM;
+        TRANSITIONS[S_NUM][IN_NUM] = S_NUM;
+        TRANSITIONS[S_START][IN_DOT] = S_DOT;
+        TRANSITIONS[S_START][IN_PLUS] = S_PLUS;
+        TRANSITIONS[S_START][IN_OPEN_PAR] = S_OPEN_PAR;
+        TRANSITIONS[S_START][IN_CLOSED_PAR] = S_CLOSED_PAR;
+        TRANSITIONS[S_START][IN_OPEN_CURLY] = S_OPEN_CURLY;
+        TRANSITIONS[S_START][IN_CLOSED_CURLY] = S_CLOSED_CURLY;
 
         // Variable names
         allLettersTo(S_START, S_VAR);
@@ -95,6 +125,13 @@ public class Tables {
         accept(S_MULT, "mult_optr");
         accept(S_SUB, "subtract_optr");
         accept(S_TERM, "terminator_op");
+        accept(S_NUM, "num_literal");
+        accept(S_DOT, "dot_op");
+        accept(S_PLUS, "plus_op");
+        accept(S_OPEN_PAR, "openPar_op");
+        accept(S_CLOSED_PAR, "closedPar_op");
+        accept(S_OPEN_CURLY, "openCurly_op");
+        accept(S_CLOSED_CURLY, "closedCurly_op");
 
         // Keywords
         addKeyword("const", "cnst_kwd");
