@@ -4,9 +4,8 @@ import java.util.Map;
 
 public class Tables {
 
-    // Columns
     public static final String KEYWORD_LETTERS = "abcdefhilnorstuw";
-    public static final int IN_LETTER = 16; // Any other letter (aA-zZ)
+    public static final int IN_LETTER = 16; // any other letter (Aa-Zz)
     public static final int IN_LT = 17; // <
     public static final int IN_GT = 18; // >
     public static final int IN_EQ = 19; // =
@@ -15,10 +14,16 @@ public class Tables {
     public static final int IN_MULT = 22; // *
     public static final int IN_SUB = 23; // -
     public static final int IN_SEMI = 24; // ;
-    public static final int IN_OTHER = 25; // anything else -> no transition
-    public static final int NUM_INPUTS = 26;
+    public static final int IN_ADD = 25; // +
+    public static final int IN_DIGIT = 26; // 0-9
+    public static final int IN_DOT = 27; // .
+    public static final int IN_LPAREN = 28; // (
+    public static final int IN_RPAREN = 29; // )
+    public static final int IN_LBRACE = 30; // {
+    public static final int IN_RBRACE = 31; // }
+    public static final int IN_OTHER = 32; // anything else -> no transition
+    public static final int NUM_INPUTS = 33;
 
-    // Rows
     public static final int S_START = 0;
     public static final int S_VAR = 1; // variable_name
     public static final int S_LT = 2; // <
@@ -27,31 +32,46 @@ public class Tables {
     public static final int S_GE = 5; // >=
     public static final int S_ASSIGN = 6; // =
     public static final int S_EQ = 7; // ==
-    public static final int S_BANG = 8; // ! (not accepting)
+    public static final int S_BANG = 8; // ! (non-accepting)
     public static final int S_NEQ = 9; // !=
     public static final int S_DIV = 10; // /
     public static final int S_MULT = 11; // *
     public static final int S_SUB = 12; // -
     public static final int S_TERM = 13; // ;
-    public static final int FIRST_KW_STATE = 14;
-    public static final int NUM_STATES = 49;
+    public static final int S_ADD = 14; // +
+    public static final int S_INCR = 15; // ++
+    public static final int S_LPAREN = 16; // (
+    public static final int S_RPAREN = 17; // )
+    public static final int S_LBRACE = 18; // {
+    public static final int S_RBRACE = 19; // }
+    public static final int S_INT_LIT = 20; // 5
+    public static final int S_NUM_DOT = 21; // 5.
+    public static final int S_DBL_LIT = 22; // 5.0
+    public static final int S_FLT_LIT = 23; // 5.0f
+
+    public static final int FIRST_KW_STATE = 24;
+    public static final int NUM_STATES = 59;
     public static final int ERR = -1;
 
     public static final Map<Character, Integer> INPUT_MAP = new HashMap<>();
 
     public static final int[][] TRANSITIONS = new int[NUM_STATES][NUM_INPUTS];
+
     public static final boolean[] ACCEPTING = new boolean[NUM_STATES];
+
     public static final String[] TOKEN_NAMES = new String[NUM_STATES];
+
     private static int nextState = FIRST_KW_STATE;
 
     static {
-        // Input Map
         for (char c = 'a'; c <= 'z'; c++)
             INPUT_MAP.put(c, IN_LETTER);
         for (char c = 'A'; c <= 'Z'; c++)
             INPUT_MAP.put(c, IN_LETTER);
         for (int i = 0; i < KEYWORD_LETTERS.length(); i++)
             INPUT_MAP.put(KEYWORD_LETTERS.charAt(i), i);
+        for (char c = '0'; c <= '9'; c++)
+            INPUT_MAP.put(c, IN_DIGIT);
         INPUT_MAP.put('<', IN_LT);
         INPUT_MAP.put('>', IN_GT);
         INPUT_MAP.put('=', IN_EQ);
@@ -60,11 +80,16 @@ public class Tables {
         INPUT_MAP.put('*', IN_MULT);
         INPUT_MAP.put('-', IN_SUB);
         INPUT_MAP.put(';', IN_SEMI);
+        INPUT_MAP.put('+', IN_ADD);
+        INPUT_MAP.put('.', IN_DOT);
+        INPUT_MAP.put('(', IN_LPAREN);
+        INPUT_MAP.put(')', IN_RPAREN);
+        INPUT_MAP.put('{', IN_LBRACE);
+        INPUT_MAP.put('}', IN_RBRACE);
 
         for (int[] row : TRANSITIONS)
             Arrays.fill(row, ERR);
 
-        // Start transitions
         TRANSITIONS[S_START][IN_LT] = S_LT;
         TRANSITIONS[S_LT][IN_EQ] = S_LE;
         TRANSITIONS[S_START][IN_GT] = S_GT;
@@ -77,12 +102,24 @@ public class Tables {
         TRANSITIONS[S_START][IN_MULT] = S_MULT;
         TRANSITIONS[S_START][IN_SUB] = S_SUB;
         TRANSITIONS[S_START][IN_SEMI] = S_TERM;
+        TRANSITIONS[S_START][IN_ADD] = S_ADD;
+        TRANSITIONS[S_ADD][IN_ADD] = S_INCR;
 
-        // Variable names
+        TRANSITIONS[S_START][IN_LPAREN] = S_LPAREN;
+        TRANSITIONS[S_START][IN_RPAREN] = S_RPAREN;
+        TRANSITIONS[S_START][IN_LBRACE] = S_LBRACE;
+        TRANSITIONS[S_START][IN_RBRACE] = S_RBRACE;
+
+        TRANSITIONS[S_START][IN_DIGIT] = S_INT_LIT;
+        TRANSITIONS[S_INT_LIT][IN_DIGIT] = S_INT_LIT;
+        TRANSITIONS[S_INT_LIT][IN_DOT] = S_NUM_DOT;
+        TRANSITIONS[S_NUM_DOT][IN_DIGIT] = S_DBL_LIT;
+        TRANSITIONS[S_DBL_LIT][IN_DIGIT] = S_DBL_LIT;
+        TRANSITIONS[S_DBL_LIT][INPUT_MAP.get('f')] = S_FLT_LIT;
+
         allLettersTo(S_START, S_VAR);
         allLettersTo(S_VAR, S_VAR);
 
-        // Accepting states
         accept(S_VAR, "variable_name");
         accept(S_LT, "lsthn_optr");
         accept(S_LE, "lsthaneqto_optr");
@@ -95,8 +132,16 @@ public class Tables {
         accept(S_MULT, "mult_optr");
         accept(S_SUB, "subtract_optr");
         accept(S_TERM, "terminator_op");
+        accept(S_ADD, "add_optr");
+        accept(S_INCR, "incr_optr");
+        accept(S_LPAREN, "lparen_op");
+        accept(S_RPAREN, "rparen_op");
+        accept(S_LBRACE, "lbrace_op");
+        accept(S_RBRACE, "rbrace_op");
+        accept(S_INT_LIT, "intLiteral");
+        accept(S_DBL_LIT, "doubleLiteral");
+        accept(S_FLT_LIT, "floatLiteral");
 
-        // Keywords
         addKeyword("const", "cnst_kwd");
         addKeyword("while", "whle_kwd");
         addKeyword("if", "if_kwd");
