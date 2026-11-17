@@ -22,11 +22,11 @@ public class X410 {
 	public static void main(String[] args) throws IOException {
 		Path in = args.length >= 1
 			? Paths.get(args[0])
-			: Paths.get("resources", "fpsample.bin");
+			: Paths.get("/Users/tylersoden/410/Studious-Geese-CS410-/src/main/java/phase3-vm/resources/", "fpsample.bin");
 
 		Path out = args.length >= 2
 			? Paths.get(args[1])
-			: Paths.get("resources", "~dump.bin");
+			: Paths.get("/Users/tylersoden/410/Studious-Geese-CS410-/src/main/java/phase3-vm/resources/", "~dump.bin");
 
 		X410 vm = new X410();
 		vm.load(in);
