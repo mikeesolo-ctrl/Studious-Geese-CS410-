@@ -5,6 +5,7 @@ public class Instruction {
 
     public static final int OP_CLR = 1;
     public static final int OP_ADD = 2;
+    public static final int OP_SUB = 3;
 
     public static final int IREG0 = 0;
     public static final int IREG1 = 1;
@@ -39,6 +40,11 @@ public class Instruction {
     public static Instruction add(int rt, int rx, int ry) {
         requireSameRegisterKind(rt, rx, ry);
         return new Instruction(encode(OP_ADD, rt, rx, ry, 0));
+    }
+
+    public static Instruction sub(int rt, int rx, int ry) {
+        requireSameRegisterKind(rt, rx, ry);
+        return new Instruction(encode(OP_SUB, rt, rx, ry, 0));
     }
 
     public static int encode(int opcode, int rt, int rx, int ry, int address) {
